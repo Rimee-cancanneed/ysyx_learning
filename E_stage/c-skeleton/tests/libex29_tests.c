@@ -1,33 +1,38 @@
-#include <stdio.h>
-#include "dbg.h"
-#include <dlfcn.h>
+#include "minunit.h"
 
-typedef int (*lib_function)(const char *data);
-
-
-int main(int argc, char *argv[])
+char *test_dlopen()
 {
-    int rc = 0;
-    check(argc == 4, "USAGE: ex29 libex29.so function data");
 
-    char *lib_file = argv[1];
-    char *func_to_run = argv[2];
-    char *data = argv[3];
-
-    void *lib = dlopen(lib_file, RTLD_NOW);
-    check(lib != NULL, "Failed to open the library %s: %s", lib_file, dlerror());
-
-    lib_function func = dlsym(lib, func_to_run);
-    check(func != NULL, "Did not find %s function in the library %s: %s", func_to_run, lib_file, dlerror());
-
-    rc = func(data);
-    check(rc == 0, "Function %s return %d for data: %s", func_to_run, rc, data);
-
-    rc = dlclose(lib);
-    check(rc == 0, "Failed to close %s", lib_file);
-
-    return 0;
-
-error:
-    return 1;
+    return NULL;
 }
+
+char *test_functions()
+{
+
+    return NULL;
+}
+
+char *test_failures()
+{
+
+    return NULL;
+}
+
+char *test_dlclose()
+{
+
+    return NULL;
+}
+
+char *all_tests() {
+    mu_suite_start();
+
+    mu_run_test(test_dlopen);
+    mu_run_test(test_functions);
+    mu_run_test(test_failures);
+    mu_run_test(test_dlclose);
+
+    return NULL;
+}
+
+RUN_TESTS(all_tests);

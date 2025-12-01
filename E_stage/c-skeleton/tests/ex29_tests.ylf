@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include "dbg.h"
+#include <dlfcn.h>
+
+typedef int (*lib_function)(const char *data);
+
+
+int main(int argc, char *argv[])
+{
+    int rc = 0;
+    check(argc == 1, "USAGE: ex29");
+
+    // char *lib_file = argv[1];
+    // char *func_to_run = argv[2];
+    // char *data = argv[3];
+    // 定义测试用例
+    struct TestCase {
+        char *func_name;
+        char *test_data;
+    } test_cases[] = {
+        {"print_a_message", "Hello from test suite"},
+        {"uppercase", "lowercase to uppercase"},
+        {"lowercase", "UPPERCASE TO LOWERCASE"},
+        //{"fail_on_purpose", "this should fail"}
+    };
+    
+    char *lib_file = "build/libex29.so";
+    int total_tests = sizeof(test_cases) / sizeof(test_cases[0]);
+    int passed_tests = 0;
+        
+    for (int i = 0; i < total_tests; i++) {
+        char *func_to_run = test_cases[i].func_name;
+        char *data = test_cases[i].test_data;
+        printf("Running test %d: %s with data: %s\n", i + 1, func_to_run, data);
+        void *lib = dlopen(lib_file, RTLD_NOW);
+        check(lib != NULL, "Failed to open the library %s: %s", lib_file, dlerror());
+        lib_function func = dlsym(lib, func_to_run);
+        check(func != NULL, "Did not find %s function in the library %s: %s", func_to_run, lib_file, dlerror());
+
+        rc = func(data);
+        check(rc == 0, "Function %s return %d for data: %s", func_to_run, rc, data);
+
+        rc = dlclose(lib);
+        check(rc == 0, "Failed to close %s", lib_file);
+        passed_tests++;
+    }
+    return 0;
+
+error:
+    return 1;
+}
